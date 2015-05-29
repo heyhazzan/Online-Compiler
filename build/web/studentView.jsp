@@ -3,6 +3,7 @@
     Created on : May 17, 2015, 8:41:50 PM
     Author     : Hazzan
 --%>
+<%@page import="com.example.dao.ProjectDao"%>
 <%
     response.setHeader("Cache-Control", "no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
@@ -130,21 +131,31 @@
             <form method = "POST" action = "UserController">
                 <c:set value = "${subsInfo}" var = "subs"/>
                 <c:set value = "${assignInfo}" var = "obj"/>
+                <c:set value = "${obj.deadline}" var = "deadline"/>
                 <input type = "hidden" name = "assign_id" value = "<c:out value = "${obj.assign_id}"/>"/>
                 <input disabled type = "text" name = "name" placeholder = "Assignment Name" value ="<c:out value = "${obj.name}"/>" /><br>
                 <textarea disabled name = "instruction" placeholder = "Instruction" rows = 4 ><c:out value = "${obj.instruction}"/></textarea><br>
                 <input disabled type = "date" name = "deadline" placeholder = "Deadline(YYYY-MM-DD)" value ="<c:out value = "${obj.deadline}"/>" /><br>
                 <input disabled type = "text" name = "file" value = "<c:out value = "${subs.score}"/>" placeholder ="Score" />
                 <hr>
-                
+
                 <input type = "file" name = "file" <c:if test="${subs.score != null}">disabled</c:if> /><br><br>
                 <select name = "language" style = "width:200px;" <c:if test="${subs.score != null}">disabled</c:if> >
-			<option value = "java">Java</option>
-                </select>
+                        <option value = "java">Java</option>
+                    </select>
                     <hr>
                     <input type = "hidden" value = "submitassign" name = "action" />
-                    <input class = "btn btn-sm btn-primary" type = "submit" name = "email" value = "Submit" <c:if test="${subs.score != null}">disabled</c:if> />
-                </form>
+                    <input class = "btn btn-sm btn-primary" type = "submit" name = "email" value = "Submit"
+                    
+                        <%
+                            String deadline = (String) pageContext.getAttribute("deadline");
+                            System.out.println("DEADLINE IN TEACHER VIEW: " + deadline);
+                            if (ProjectDao.isDeadline(deadline)) {
+                        %>
+                        disabled
+                        <%}%>
+                        />
+            </form>
         </div>
     </body>
 </html>

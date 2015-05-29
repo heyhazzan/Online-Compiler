@@ -5,6 +5,7 @@ Document   /* global id */
 Created on : May 17, 2015, 8:41:50 PM
 Author     : Hazzan
 --%>
+<%@page import="com.example.dao.ProjectDao"%>
 <%
     response.setHeader("Cache-Control", "no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
@@ -54,7 +55,7 @@ Author     : Hazzan
                 margin: auto auto;
                 top:10%;
                 width: 25%;
-                height: 70%;
+                height: 75%;
                 padding: 1%;
                 border: 10px solid #3c3d3d;
                 background-color: white;
@@ -91,31 +92,31 @@ Author     : Hazzan
             function addAtt(obj, att, value) {
                 document.getElementById(obj).setAttribute(att, value);
             }
-            function setAtt(obj,value) {
+            function setAtt(obj, value) {
                 document.getElementById(obj).value = value;
             }
-            function disabledOff(obj,value) {
+            function disabledOff(obj, value) {
                 document.getElementById(obj).disabled = value;
             }
+            function saveButton() {
+                addAtt("nm", "disabled", "disabled");
+                addAtt("ins", "disabled", "disabled");
+                addAtt("dead", "disabled", "disabled");
+                addAtt("in", "disabled", "disabled");
+                addAtt("out", "disabled", "disabled");
+                document.getElementById("subs").disabled = false;
+                setAtt("ed", "Edit");
+            }
             function editButton() {
-                if (document.getElementById('ed').value == "Save"){
-                    addAtt("nm", "disabled", "disabled");
-                    addAtt("ins", "disabled", "disabled");
-                    addAtt("dead", "disabled", "disabled");
-                    addAtt("in", "disabled", "disabled");
-                    addAtt("out", "disabled", "disabled");
-                    document.getElementById("subs").disabled = false;
-                    setAtt("ed","Edit");
-                }else{
-                    addAtt("subs", "disabled", "disabled");
-                    document.getElementById("nm").disabled = false;
-                    document.getElementById("ins").disabled = false;
-                    document.getElementById("dead").disabled = false;
-                    document.getElementById("in").disabled = false;
-                    document.getElementById("out").disabled = false;
-                    setAtt("ed","Save");
-                }
-
+                addAtt("subs", "disabled", "disabled");
+                document.getElementById("saveButton").style.display = "block";
+                document.getElementById("nm").disabled = false;
+                document.getElementById("ins").disabled = false;
+                document.getElementById("dead").disabled = false;
+                document.getElementById("in").disabled = false;
+                document.getElementById("out").disabled = false;
+                document.getElementById("ed").style.display = "none";
+                enter('saveButton');
             }
         </script>
     </head>
@@ -185,16 +186,18 @@ Author     : Hazzan
             <h3>Assignment Form</h3><hr>
             <form method = "POST" action = "UserController">
                 <c:set value = "${assignInfo}" var = "obj" />
+                <c:set var="deadline" value="${obj.deadline}"/>
                 <input type = "hidden" name = "assign_id" value = "<c:out value = "${obj.assign_id}"/>"/>
-                <input disabled type = "text" name = "name" id = "nm" placeholder = "Assignment Name" value ="<c:out value = "${obj.name}"/>" /><br>
-                <textarea disabled name = "instruction" id = "ins" placeholder = "Instruction" rows = 5 ><c:out value = "${obj.instruction}"/></textarea><br>
+                <h6>Name:</h6>
+                <input disabled type = "text" name = "name" id = "nm" placeholder = "Assignment Name" value ="<c:out value = "${obj.name}"/>" />
+                <h6>Instructions:</h6>
+                <textarea disabled name = "instruction" id = "ins" placeholder = "Instruction" rows = 5 ><c:out value = "${obj.instruction}"/></textarea>
+                <h6>Deadline:</h6>
                 <input disabled type = "date" name = "deadline"  id = "dead" placeholder = "Deadline(YYYY-MM-DD)" value ="<c:out value = "${obj.deadline}"/>" /><br>
-                <input disabled type = "file" name = "inputs" id = "in" placeholder = "Test Cases" value ="<c:out value = "${obj.inputs}"/>" /><br>
-                <input disabled type = "file" name = "output" id = "out" placeholder = "Expected Output" value ="<c:out value = "${obj.output}"/>" /><br>
                 <input type = "hidden" value = "editassign" name = "action"/><hr>
-                <input style = "width:110px" type = "submit" id = "ed" name = "edit" value = "Edit" class = "btn btn-sm btn-primary" onclick = "editButton();"/>
-              IDEA HERE GET THE VALUE IF BUTTON EDIT AND MAKE IF STATEMENT IN USER CONTROLLER! :D
-                <button style = "width:110px" type="button" id = "subs" class = "btn btn-sm btn-primary" onclick = "document.location = 'UserController?action=viewsubmissions&assign_id=<c:out value = '${obj.assign_id}'/>';
+                <input style = "width:110px;position:absolute;left:10%;" type = "button" id = "ed" name = "edit" value = "Edit" class = "btn btn-sm btn-primary" onclick = "editButton();"/>
+                <input style = "width:110px;position:absolute;left:10%;display:none;" type = "submit" id = "saveButton" name = "edit" value = "Save" class = "btn btn-sm btn-primary" onclick = "saveButton();"/>
+                <button style = "width:110px;position:absolute;right:10%;" type="button" id = "subs" class = "btn btn-sm btn-primary" onclick = "document.location = 'UserController?action=viewsubmissions&assign_id=<c:out value = '${obj.assign_id}'/>';
                         enter('viewSubs');">Submissions</button>
             </form>
         </div>
@@ -225,8 +228,7 @@ Author     : Hazzan
                     </tbody>
                 </table>
             </div>
-            <%
-                if (session.getAttribute("submissions") != null) {
+            <%                if (session.getAttribute("submissions") != null) {
                     session.setAttribute("submissions", null);
                 }
             %>

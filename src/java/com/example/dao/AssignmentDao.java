@@ -42,27 +42,29 @@ public class AssignmentDao extends HttpServlet {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, e);
         }
 
-    } 
-    public static void updateAssignment(AssignmentBean ab) throws SQLException, IOException{
-        DbUtil db = new DbUtil();        
-        try{
+    }
+
+    public static void updateAssignment(AssignmentBean ab) throws SQLException, IOException {
+        DbUtil db = new DbUtil();
+        try {
             PreparedStatement stmt = db.getConnection().prepareStatement(""
-                    +"UPDATE assignment SET name = ?, instruction=?, deadline=?, inputs=?,"
-                    + "output=? WHERE assign_id=?");
+                    + "UPDATE assignment SET name = ?, instruction=?, deadline=? WHERE assign_id=?");
+
             stmt.setString(1, ab.getName());
-            stmt.setString(1, ab.getInstruction());
-            stmt.setString(1, ab.getDeadline());
-            stmt.setString(1, ab.getInputs());
-            stmt.setString(1, ab.getOutput());
-            stmt.setString(1, String.valueOf(ab.getAssign_id()));
+            stmt.setString(2, ab.getInstruction());
+            stmt.setString(3, ab.getDeadline());
+            stmt.setInt(4, ab.getAssign_id());
+            
+            System.out.println("NEW NAME!"+ab.getName());
+            System.out.println("NEW INS!"+ab.getInstruction());
+
             stmt.executeUpdate();
             stmt.close();
             db.disconnect();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
 
     public static List<AssignmentBean> getAllAssignmentsTeacher(String faculty_number) throws IOException {
         List<AssignmentBean> assigns = new ArrayList();

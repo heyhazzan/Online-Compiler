@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,10 +27,32 @@ import java.util.logging.Logger;
  * @author Hazzan
  */
 public class ProjectDao {
-    
-    public static void addSubmission(ProjectBean pb) throws SQLException, IOException{
+
+    public static boolean isDeadline(String deadline) throws ParseException {
+        boolean result = true;
+        if (deadline != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date dl = format.parse(deadline);
+            Date today = new Date();
+
+            out.println("DEADLINE: " + deadline);
+            out.println("FORMATED DEADLINE: " + dl);
+            out.println("TODAYYYY DEADLINE: " + today);
+            out.println("COMPARE RESULT: " + today.compareTo(dl));
+            if (today.compareTo(dl) < 0) {
+                result = false;
+            } else {
+                result = true;
+            }   
+        } else {
+            out.println("DEADLINE IS NULL!");
+        }
+        return result;
+    }
+
+    public static void addSubmission(ProjectBean pb) throws SQLException, IOException {
         DbUtil db = new DbUtil();
-        try{
+        try {
             PreparedStatement stmt = db.getConnection().prepareStatement(""
                     + "INSERT INTO project (file, language, date, score, stud_number, assign_id) VALUES (?, ?, ?, NULL, ?, ?)");
             stmt.setString(1, pb.getFile());
@@ -38,15 +61,15 @@ public class ProjectDao {
             stmt.setString(4, pb.getStud_number());
             stmt.setInt(5, pb.getAssign_id());
             stmt.executeUpdate();
-            
+
             stmt.close();
             db.disconnect();
         } catch (SQLException e) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
-    public static List<ProjectBean> getSubmissions(String id) throws IOException{
+
+    public static List<ProjectBean> getSubmissions(String id) throws IOException {
         List<ProjectBean> submissions = new ArrayList();
         DbUtil db = new DbUtil();
         int assign_id = Integer.parseInt(id);
@@ -63,7 +86,7 @@ public class ProjectDao {
                 pb.setScore(rs.getDouble("score"));
                 pb.setStud_number(rs.getString("stud_number"));
                 pb.setAssign_id(rs.getInt("assign_id"));
-                
+
                 submissions.add(pb);
             }
             rs.close();
@@ -74,7 +97,7 @@ public class ProjectDao {
         }
         return submissions;
     }
-    
+
     public static ProjectBean getProjInfo(String assign_id, String stud_number) throws IOException {
         DbUtil db = new DbUtil();
         ProjectBean pb = null;
@@ -104,9 +127,10 @@ public class ProjectDao {
         }
         return pb;
     }
-    
-    
-    public static void main(String[] args) throws IOException{
+
+    public static void main(String[] args) throws IOException, ParseException {
         //code tester
+        String deadline = "1990-03-03";
+        isDeadline(deadline);
     }
 }

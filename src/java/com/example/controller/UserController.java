@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -78,24 +79,6 @@ public class UserController extends HttpServlet {
             List<ProjectBean> pb = (List<ProjectBean>) session.getAttribute("submissions");
             response.sendRedirect("teacherView.jsp");
         }else if(action.equals("editassign")){
-            AssignmentBean ab = new AssignmentBean();
-            String name = request.getParameter("name");
-            String ins = request.getParameter("ins");
-            String dead = request.getParameter("dead");
-            String in = request.getParameter("in");
-            String out = request.getParameter("out");
-            String fac= (String) session.getAttribute("username");
-            
-            System.out.println("FAACCC"+fac);
-            System.out.println("Name:"+name);
-            System.out.println("Dead:"+dead);
-            
-            ab.setName(name);
-            ab.setInstruction(ins);
-            ab.setDeadline(dead);
-            ab.setInputs(in);
-            ab.setOutput(out);
-            ab.setFaculty_number(fac);
         }
     }
 
@@ -111,8 +94,11 @@ public class UserController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        String edit = request.getParameter("edit");
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         out.println("ACTIIIOOOONNN:" + action);
+        out.println("EDIT VA:LUUUEEE:" + edit);
+        
         HttpSession session = request.getSession();
         if (action.equals("addassign")) {
 
@@ -133,8 +119,7 @@ public class UserController extends HttpServlet {
 
             AssignmentDao.addAssignment(ab);
             session.setAttribute("currentAssign", null);
-            // RequestDispatcher view = request.getRequestDispatcher("teacherView.jsp");
-            //view.forward(request, response);
+            
             response.sendRedirect("teacherView.jsp");
         } else if (action.equals("submitassign")) {
             Date date = new Date();
@@ -162,6 +147,27 @@ public class UserController extends HttpServlet {
             session.setAttribute("currentAssign", null);
             response.sendRedirect("studentView.jsp");
 
+        }else if(action.equals("editassign")){//Start Edit Query here
+            AssignmentBean ab = new AssignmentBean();
+            String name = request.getParameter("name");
+            String ins = request.getParameter("instruction");
+            String dead = request.getParameter("deadline");
+            String assign_id = request.getParameter("assign_id");
+            
+            
+            ab.setName(name);
+            ab.setInstruction(ins);
+            ab.setDeadline(dead);
+            ab.setAssign_id(Integer.parseInt(assign_id));
+            
+            try {
+                AssignmentDao.updateAssignment(ab);
+            } catch (SQLException ex) {
+                Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            session.setAttribute("assigns", AssignmentDao.getAllAssignmentsTeacher((String) session.getAttribute("username")));
+            session.setAttribute("assignInfo", AssignmentDao.getAssignInfo((String) request.getSession().getAttribute("currentAssign")));
+            response.sendRedirect("teacherView.jsp");
         }
     }
 
