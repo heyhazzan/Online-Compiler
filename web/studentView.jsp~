@@ -128,7 +128,7 @@
             <button type="button" class="close" onclick = "cls('viewAssign');">[&times;]</button><br>
             <!--inside the add Assignments-->
             <h3>Assignment Form</h3><hr>
-            <form method = "POST" action = "UserController" enctype = "multipart/form-data">
+            <form method = "POST" action = "UserController">
                 <c:set value = "${subsInfo}" var = "subs"/>
                 <c:set value = "${assignInfo}" var = "obj"/>
                 <c:set value = "${obj.deadline}" var = "deadline"/>
